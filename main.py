@@ -1,23 +1,25 @@
 import os
 
-opcoes_menu = ["Adicionar tarefa", "Visualizar tarefas", "Remover tarefa"]
+opcoes_menu = ["Adicionar tarefa", "Visualizar tarefas", "Remover tarefa", "Sair"]
 lista_de_tarefas = []
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
 def retornar_ao_menu_principal():
-
     while True:
-        resposta = input("\nDeseja retornar ao menu principal? (S/N): ").upper().strip()
+        resposta = input("\nDeseja retornar ao menu principal (S/N)? ").upper().strip()
 
-        if resposta in ["S", "N"]:
-            limpar_tela()
+        if resposta not in ["S", "N"]:
+            print("\n[ERROR] - Entrada inválida")
+        else:
             break
+    
+    if resposta == "N":
+        limpar_tela()
+        print("Encerrando programa")
+        exit()        
 
-    if resposta == "S":
-        executar_programa()
-
-    # adicionar um else para encerrar o programa
+    limpar_tela()
 
 def exibir_titulo():
     titulo = "Bem-vindo ao Organizador de Tarefas"
@@ -28,7 +30,7 @@ def exibir_titulo():
     print(f"{borda}\n")
 def exibir_menu():
     for i, opcao in enumerate(opcoes_menu, start=1):
-        print(f"{i} - {opcao}")   
+        print(f"{i} - {opcao}")  
 def selecionar_opcao():
     while True:
         try:
@@ -40,6 +42,11 @@ def selecionar_opcao():
                 return opcoes_selecionada                
         except ValueError:
             print("\n[ERRO] Selecione uma opção válida")
+def listar_tarefas():
+    print(f"{'Índice'} | {'Tarefa'.ljust(50)} | {'Status'}")
+
+    for i, tarefa in enumerate(lista_de_tarefas, start=1):
+        print(f"{str(i).ljust(6)} | {tarefa['titulo'].ljust(50)} | {'✅' if tarefa['status'] else '❌'}")
 
 def adicionar_tarefa():
 
@@ -59,17 +66,18 @@ def visualizar_tarefas():
 
     limpar_tela()
 
-    print(f"{'Índice'} | {'Tarefa'.ljust(50)} | {'Status'}")
+    if not lista_de_tarefas:
+        print("Não há tarefas registradas")
+        retornar_ao_menu_principal()
 
-    for i, tarefa in enumerate(lista_de_tarefas, start=1):
-        print(f"{str(i).ljust(6)} | {tarefa['titulo'].ljust(50)} | {tarefa['status']}")  
+    listar_tarefas()
 
-    # retornar_ao_menu_principal()      
+    retornar_ao_menu_principal()
 def remover_tarefa():    
     
     limpar_tela()
 
-    visualizar_tarefas()
+    listar_tarefas()
 
     while True:
         try:
@@ -84,23 +92,29 @@ def remover_tarefa():
 
     indice_corrigido = tarefa_selecionada - 1
 
-    lista_de_tarefas.pop(indice_corrigido)
+    tarefa_removida = lista_de_tarefas.pop(indice_corrigido)
 
-def executar_programa():
+    mensagem_retorno = f"Tarefa: '{tarefa_removida['titulo']}' removida com sucesso"
+
+    print("")    
+    print(f"-"*len(mensagem_retorno))
+    print(mensagem_retorno)
+    print("-"*len(mensagem_retorno))
+
+    retornar_ao_menu_principal()
+
+while True:
     exibir_titulo()
     exibir_menu()
     opcao_selecionada = selecionar_opcao()
 
     if opcao_selecionada == 1:
         adicionar_tarefa()
-    if opcao_selecionada == 2:
+    elif opcao_selecionada == 2:
         visualizar_tarefas()
-        retornar_ao_menu_principal() 
-    if opcao_selecionada == 3:
+    elif opcao_selecionada == 3:
         remover_tarefa()
-        
-        retornar_ao_menu_principal() 
-    print("Encerrando o programa.")
-
-if __name__ == "__main__":
-    executar_programa()
+    else:
+        limpar_tela()
+        print("Encerrando programa")
+        break
